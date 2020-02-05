@@ -86,6 +86,32 @@ Para colocar uma informação extra na tabela de log, como dizer qual o usuário
 ```java
 ThreadContext.put("userId", loggedUser);
 ThreadContext.put("operation", "INSERT");
+logger.log(Level.getLevel("AUDIT"), ...
 ```
 
 Assim, na coluna `USER_ID` será colocado o valor da string `loggerUser`, e na coluna `OPERATION` a string "INSERT".
+
+# Exemplo
+
+```java
+package io.github.jonnrauber.log4jtest.dao;
+public class TestDAO {
+  private static final Logger logger = LogManager.getLogger(TestDAO.class);
+  
+  public void save(Entity entity) {
+    // [...]
+    // salvar entity no banco
+    // [...]
+    String loggedUser = "admin";
+    ThreadContext.put("userId", loggedUser);
+    ThreadContext.put("operation", "INSERT");
+    logger.log(Level.getLevel("AUDIT"), "Inserindo dado na tabela Entity");
+    // [...]
+  }
+}
+```
+A execução do código acima gera o seguinte dado na tabela de log do banco:
+
+USER_ID | EVENT_DATE | LOGGER | LOG_LEVEL | MESSAGE | OPERATION
+--- | --- | --- | --- | --- | ---
+admin | 05/02/2020 16:34:57 | io.github.jonnrauber.log4jtest.dao.TestDAO | AUDIT | Inserindo dado na tabela Entity | INSERT
